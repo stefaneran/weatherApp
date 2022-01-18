@@ -4,39 +4,40 @@
 
 const weather = {
     apiKey: '822fbfeb39cbef5b8c2cfe78f277bcea',
-    fetchWeather: function(city) {
-        fetch(
+    fetchWeather: async function(city) {
+        // fetch is asyncronous, wait for it to get the response
+        const response = await fetch(
             "https://api.openweathermap.org/data/2.5/weather?q=" 
             + city 
             + "&units=metric&appid=" 
             + this.apiKey
          )
-        .then((response) => {
-            if (!response.ok) {
-                alert("Not found")
-                throw new error('Not found');
-            }
-            return response.json();
-        })
-        .then((data) => this.displayWeather(data));
+        if (!response.ok) {
+            alert("Not found")
+            throw new error('Not found');
+        }
+        // .json() is asynchronous, wait for it to read and return a JS object
+        const responseData = await response.json();
+        // In the end display the weather, without await responseData would be an invalid value like Promise or undefined
+        this.displayWeather(responseData)
     },
     displayWeather: function(data) {
-const { name } = data;
-const { icon, description } = data.weather[0];
-const { temp, humidity } = data.main; 
-const { speed } = data.wind; 
-document.querySelector('.city').innerText = "Weather in " + name;
-document.querySelector('.icon').src =
-      "https://openweathermap.org/img/wn/" + icon + ".png";
-      document.querySelector('.description').innerText = description;
-      document.querySelector('.temp').innerText = temp + "°C";
-      document.querySelector('.humidity').innerText =
-      "Humidity: " + humidity + "%";
-      document.querySelector('.wind').innerText =
-      "Wind speed: " + speed + " km/h";
-      document.querySelector('.weather').classList.remove("loading");
-      document.body.style.backgroundImage =
-      "url('https://source.unsplash.com/1600x900/?" + name + "')";
+        const { name } = data;
+        const { icon, description } = data.weather[0];
+        const { temp, humidity } = data.main; 
+        const { speed } = data.wind; 
+        document.querySelector('.city').innerText = "Weather in " + name;
+        document.querySelector('.icon').src =
+        "https://openweathermap.org/img/wn/" + icon + ".png";
+        document.querySelector('.description').innerText = description;
+        document.querySelector('.temp').innerText = temp + "°C";
+        document.querySelector('.humidity').innerText =
+        "Humidity: " + humidity + "%";
+        document.querySelector('.wind').innerText =
+        "Wind speed: " + speed + " km/h";
+        document.querySelector('.weather').classList.remove("loading");
+        document.body.style.backgroundImage =
+        "url('https://source.unsplash.com/1600x900/?" + name + "')";
   }, 
   search: function () {
      this.fetchWeather(document.querySelector('.search-bar').value);
